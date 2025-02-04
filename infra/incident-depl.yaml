@@ -1,0 +1,111 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: incident-pvc
+spec:
+  storageClassName: azurefile-premium
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 5Gi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: incident-depl
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: incident
+  template:
+    metadata:
+      labels:
+        app: incident
+    spec:
+      containers:
+        - name: incident
+          image: moxfive/incident:dev
+          imagePullPolicy: "Always"
+          securityContext:
+            allowPrivilegeEscalation: false
+          resources:
+            limits:
+              cpu: 500m
+              memory: 512Mi
+            requests:
+              cpu: 400m
+              memory: 412Mi
+          volumeMounts:
+            - mountPath: /tmp
+              name: tmp
+            - name: data
+              mountPath: /uploads
+            - name: data
+              mountPath: /exports
+            - name: data
+              mountPath: /sample
+#            - name: key-m5p-dev
+#              mountPath: "/mnt/secrets-store"
+#              readOnly: true
+          env:
+            - name: TMPDIR
+              value: /tmp
+            - name: CLIENT_ID
+              valueFrom:
+                secretKeyRef:
+                  name: client-id-secret
+                  key: CLIENT_ID
+            - name: CLIENT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: client-secret-secret
+                  key: CLIENT_SECRET
+            - name: TENANT_ID
+              valueFrom:
+                secretKeyRef:
+                  name: tenant-id-secret
+                  key: TENANT_ID
+            - name: KEY_VAULT_NAME
+              valueFrom:
+                secretKeyRef:
+                  name: key-vault-name-secret
+                  key: KEY_VAULT_NAME
+            - name: DOMAIN_URL
+              value: https://dev.phoenix.moxfive.com
+            - name: POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+      imagePullSecrets:
+        - name: docker-regcred
+      volumes:
+        - emptyDir: {}
+          name: tmp
+        - name: data
+          persistentVolumeClaim:
+            claimName: incident-pvc
+#        - name: key-m5p-dev
+#          csi:
+#            driver: secrets-store.csi.k8s.io
+#            readOnly: true
+#            volumeAttributes:
+#              secretProviderClass: "azure-kvname-system-msi"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: incident-srv
+spec:
+  selector:
+    app: incident
+  ports:
+    - name: incident
+      protocol: TCP
+      port: 3000
+      targetPort: 3000
+    - name: grpc
+      protocol: TCP
+      port: 3006
+      targetPort: 3006
