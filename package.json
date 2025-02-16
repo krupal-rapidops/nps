@@ -26,7 +26,7 @@
     "@moxfive-llc/common": "1.2.91",
     "@types/cookie-parser": "1.4.2",
     "@types/express": "4.17.13",
-    "@types/hpp": "0.2.2",
+    "@types/hpp": "0.2.6",
     "@types/cors": "2.8.17",
     "cors": "2.8.5",
     "cookie-parser": "1.4.7",
