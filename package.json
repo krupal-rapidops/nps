@@ -24,7 +24,7 @@
   "license": "ISC",
   "dependencies": {
     "@moxfive-llc/common": "1.2.91",
-    "@types/cookie-parser": "1.4.2",
+    "@types/cookie-parser": "1.4.8",
     "@types/express": "4.17.13",
     "@types/hpp": "0.2.2",
     "@types/cors": "2.8.17",
