@@ -37,7 +37,7 @@
     "hpp": "0.2.3",
     "mongoose": "6.13.5",
     "mongoose-update-if-current": "1.4.0",
-    "nats": "2.6.1",
+    "nats": "2.29.1",
     "ts-node-dev": "1.1.8",
     "typescript": "5.5.4"
   },
